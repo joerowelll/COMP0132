@@ -52,17 +52,15 @@ fRANSAC = estimateFundamentalMatrix(points93, ...
     NumTrials=2000,DistanceThreshold=1e-4)
 m = size(out94gray)
 gradients = (points93.Location(:,2)-points94.Location(:,2))./(points93.Location(:,1)-points94.Location(:,1));
-gradients_std = std(gradients);
-gradients_mean = mean(gradients);
+gradients_std = std(gradients)
+gradients_mean = mean(gradients)
 figure;
 showMatchedFeatures(out93,out94,points93, points94,'montage','PlotOptions',{'ro','go','y--'});
 title('Putative Point Matches');
 hold on
 
 for i=1:length(gradients)
-    % plot feature matches that gradient between points exceeds gradients
-    % mean + 0.5* std gradients
-    if (abs(gradients(i)) >= (gradients_mean + 0.5*gradients_std))
+    if (abs(gradients(i)) >= 0.5)
         plot([points93.Location(i,1), points94.Location(i,1) + m(2)],[points93.Location(i,2), points94.Location(i,2)],'-b')
     end
 
