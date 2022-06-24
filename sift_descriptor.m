@@ -1,3 +1,5 @@
+format long
+
 f=imread('out90.png');
 % Change sigma for different standard deviations e.g. 0.25, 0.5, 0.75 etc.
 sigma = 0.5
@@ -12,22 +14,22 @@ imshow(filtered_img2);
 
 
 % Detect scale invariant feature transform (SIFT) features and return SIFTPoints object
-f2= rgb2gray(f)
-filtered_img2 = rgb2gray(filtered_img2)
-points = detectSIFTFeatures(f2)
-points_2 = detectSIFTFeatures(filtered_img2)
+f2= rgb2gray(f);
+filtered_img2 = rgb2gray(filtered_img2);
+points = detectSIFTFeatures(f2);
+points_2 = detectSIFTFeatures(filtered_img2);
 
 % Overlay most salient features on 
 figure
-imshow(f)
+imshow(f);
 hold on;
-plot(points.selectStrongest(200))
+plot(points.selectStrongest(200));
 
 % Overlay 200 most salient features on filtered image
 figure
-imshow(filtered_img2)
+imshow(filtered_img2);
 hold on;
-plot(points_2.selectStrongest(200))
+plot(points_2.selectStrongest(200));
 
 % Feature Matching Diagram Example
 
@@ -39,19 +41,29 @@ out94gray = rgb2gray(out94);
 % RANSAC feature matching 
 
 load stereoPointPairs
-points93 = detectSIFTFeatures(out93gray)
-points93 = points93.selectStrongest(400)
-points94 = detectSIFTFeatures(out94gray)
-points94 = points94.selectStrongest(400)
+points93 = detectSIFTFeatures(out93gray); % Detect SIFT features
+points93 = points93.selectStrongest(200); % Select 400 most salient
+points94 = detectSIFTFeatures(out94gray); % Detect SIFT Features
+points94 = points94.selectStrongest(200); % Select 400 most salient
 
 % Compute fundamental matrix
 fRANSAC = estimateFundamentalMatrix(points93, ...
     points94,Method="RANSAC", ...
     NumTrials=2000,DistanceThreshold=1e-4)
-
+m = size(out94gray)
+gradients = (points93.Location(:,2)-points94.Location(:,2))./(points93.Location(:,1)-points94.Location(:,1));
 figure;
 showMatchedFeatures(out93,out94,points93, points94,'montage','PlotOptions',{'ro','go','y--'});
 title('Putative Point Matches');
+hold on
+
+for i=1:length(gradients)
+    if (abs(gradients(i)) >= 0.5)
+        plot([points93.Location(i,1), points94.Location(i,1) + m(2)],[points93.Location(i,2), points94.Location(i,2)], '-b')
+    end
+
+end
+
 
 
 
